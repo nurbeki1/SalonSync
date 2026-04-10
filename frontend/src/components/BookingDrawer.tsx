@@ -289,13 +289,15 @@ export default function BookingDrawer({ salon, onClose, locale, onOpenMyBookings
 
   useEffect(() => {
     if (step !== "datetime" || !selectedMaster || !selectedService) return;
+    const master = selectedMaster;
+    const service = selectedService;
     let cancelled = false;
     async function loadDates() {
       setDatesLoading(true);
       try {
         const res = await getAvailableDates(
-          selectedMaster.id,
-          selectedService.id,
+          master.id,
+          service.id,
           calendarMonth
         );
         if (!cancelled) setAvailableDateSet(new Set(res.dates));
@@ -402,9 +404,9 @@ export default function BookingDrawer({ salon, onClose, locale, onOpenMyBookings
 
     try {
       const booking = await createBooking({
-        master_id: selectedMaster.id,
-        service_id: selectedService.id,
-        start_time: selectedSlot.start_time,
+        master_id: selectedMaster!.id,
+        service_id: selectedService!.id,
+        start_time: selectedSlot!.start_time,
         client_name: clientName,
         client_phone: clientPhone.replace(/\D/g, ""),
       });
@@ -461,6 +463,7 @@ export default function BookingDrawer({ salon, onClose, locale, onOpenMyBookings
   };
 
   return (
+    <>
     <AnimatePresence>
       <motion.div
         className="fixed inset-0 z-50 flex items-end justify-center sm:items-center"
@@ -1045,15 +1048,16 @@ export default function BookingDrawer({ salon, onClose, locale, onOpenMyBookings
           </div>
         </motion.div>
       </motion.div>
-
-      {portfolioMaster && (
-        <MasterPortfolioModal
-          master={portfolioMaster}
-          isOpen
-          onClose={() => setPortfolioMaster(null)}
-          locale={locale}
-        />
-      )}
     </AnimatePresence>
+
+    {portfolioMaster && (
+      <MasterPortfolioModal
+        master={portfolioMaster}
+        isOpen
+        onClose={() => setPortfolioMaster(null)}
+        locale={locale}
+      />
+    )}
+    </>
   );
 }
