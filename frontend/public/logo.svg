@@ -1,0 +1,15 @@
+<svg width="200" height="48" viewBox="0 0 200 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Icon: sync circle with arrows -->
+  <circle cx="24" cy="24" r="18" stroke="#D4AF37" stroke-width="2.5"/>
+  <path d="M31 20C31 20 29.5 17 24 17C18.5 17 17 20 17 20" stroke="#D4AF37" stroke-width="2.2" stroke-linecap="round"/>
+  <path d="M17 28C17 28 18.5 31 24 31C29.5 31 31 28 31 28" stroke="#D4AF37" stroke-width="2.2" stroke-linecap="round"/>
+  <path d="M31 20L33 18M33 18L31 16M33 18H30" stroke="#D4AF37" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M17 28L15 30M15 30L17 32M15 30H18" stroke="#D4AF37" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="24" cy="24" r="3" fill="#D4AF37" opacity="0.3"/>
+  <circle cx="24" cy="24" r="1.5" fill="#D4AF37"/>
+
+  <!-- Text: SalonSync -->
+  <text x="52" y="31" font-family="'Playfair Display', Georgia, serif" font-weight="700" font-size="24" fill="#1A1A1A">
+    Salon<tspan fill="#D4AF37">Sync</tspan>
+  </text>
+</svg>

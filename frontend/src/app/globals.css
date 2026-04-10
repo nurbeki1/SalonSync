@@ -1,0 +1,300 @@
+@import "tailwindcss";
+
+/* ========================================
+   LUXURY MINIMALIST DESIGN SYSTEM
+   Beauty Salon Booking Platform
+   ======================================== */
+
+@theme inline {
+  /* Colors */
+  --color-bone: #FAF9F6;
+  --color-graphite: #1A1A1A;
+  --color-gold: #1f1f1f;
+  --color-gold-light: #454545;
+  --color-gold-dark: #0f0f0f;
+  --color-cream: #F5F5DC;
+  --color-warm-gray: #9C9C9C;
+  --color-light-gray: #E8E8E8;
+
+  /* Semantic Colors */
+  --color-background: var(--color-bone);
+  --color-foreground: var(--color-graphite);
+  --color-primary: var(--color-graphite);
+  --color-primary-foreground: #ffffff;
+  --color-secondary: #f2f2f2;
+  --color-muted: var(--color-warm-gray);
+  --color-border: var(--color-light-gray);
+
+  /* Typography */
+  --font-serif: var(--font-playfair);
+  --font-sans: var(--font-inter);
+
+  /* Shadows */
+  --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.05), 0 10px 20px rgba(0, 0, 0, 0.03);
+  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.06);
+  --shadow-elevated: 0 10px 30px rgba(0, 0, 0, 0.12);
+
+  /* Radius */
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --radius-2xl: 2rem;
+  --radius-3xl: 2.5rem;
+}
+
+/* Base Styles */
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+
+  body {
+    @apply bg-bone text-graphite antialiased;
+    font-feature-settings: "kern" 1, "liga" 1;
+  }
+
+  :focus-visible {
+    @apply outline-none ring-2 ring-gold/70 ring-offset-2 ring-offset-bone;
+  }
+
+  /* Elegant Selection */
+  ::selection {
+    @apply bg-gold/30 text-graphite;
+  }
+
+  /* Scrollbar Styling */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-bone;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-light-gray rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-warm-gray;
+  }
+}
+
+/* Typography Classes */
+@layer components {
+  .heading-display {
+    @apply font-serif font-bold tracking-tight;
+  }
+
+  .heading-xl {
+    @apply font-serif text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.1];
+  }
+
+  .heading-lg {
+    @apply font-serif text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight leading-tight;
+  }
+
+  .heading-md {
+    @apply font-serif text-2xl md:text-3xl font-semibold tracking-tight;
+  }
+
+  .heading-sm {
+    @apply font-serif text-xl md:text-2xl font-semibold;
+  }
+
+  .body-lg {
+    @apply font-sans text-lg leading-relaxed;
+  }
+
+  .body-md {
+    @apply font-sans text-base leading-relaxed;
+  }
+
+  .body-sm {
+    @apply font-sans text-sm leading-relaxed;
+  }
+
+  .label {
+    @apply font-sans text-xs font-medium uppercase tracking-widest text-warm-gray;
+  }
+}
+
+/* Button Styles */
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2
+           px-8 py-4
+           bg-graphite text-bone
+           font-sans font-semibold text-sm uppercase tracking-wider
+           rounded-full
+           transition-all duration-300 ease-out
+           hover:bg-black hover:shadow-card hover:-translate-y-0.5
+           active:translate-y-0 active:shadow-card
+           focus:outline-none focus:ring-2 focus:ring-graphite focus:ring-offset-2 focus:ring-offset-bone;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2
+           px-8 py-4
+           bg-transparent text-graphite
+           font-sans font-semibold text-sm uppercase tracking-wider
+           rounded-full
+           border border-graphite/25
+           transition-all duration-300 ease-out
+           hover:border-graphite hover:bg-graphite/5
+           focus:outline-none focus:ring-2 focus:ring-graphite focus:ring-offset-2 focus:ring-offset-bone;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2
+           px-6 py-3
+           bg-transparent text-graphite
+           font-sans font-medium text-sm
+           rounded-full
+           transition-all duration-300 ease-out
+           hover:bg-graphite/5
+           focus:outline-none focus:ring-2 focus:ring-graphite/20;
+  }
+}
+
+/* Card Styles */
+@layer components {
+  .card {
+    @apply bg-white rounded-3xl p-6 border border-light-gray/80 shadow-soft
+           transition-all duration-300 ease-out
+           hover:shadow-card;
+  }
+
+  .card-elevated {
+    @apply bg-white rounded-3xl p-8 border border-light-gray/80 shadow-card
+           transition-all duration-500 ease-out
+           hover:shadow-elevated;
+  }
+
+  .card-glass {
+    @apply bg-white/90 backdrop-blur-xl rounded-3xl p-6
+           border border-light-gray/70
+           shadow-soft;
+  }
+}
+
+/* Input Styles */
+@layer components {
+  .input {
+    @apply w-full px-6 py-4
+           bg-white text-graphite
+           font-sans text-base
+           rounded-2xl
+           border-2 border-light-gray
+           transition-all duration-300 ease-out
+           placeholder:text-warm-gray
+           focus:outline-none focus:border-gold focus:ring-4 focus:ring-gold/10;
+  }
+
+  .input-error {
+    @apply border-red-400 focus:border-red-400 focus:ring-red-400/10;
+  }
+}
+
+/* Glassmorphism Modal */
+@layer components {
+  .modal-overlay {
+    @apply fixed inset-0 z-50
+           bg-graphite/40 backdrop-blur-sm;
+  }
+
+  .modal-content {
+    @apply bg-white/95 backdrop-blur-xl
+           rounded-3xl
+           shadow-elevated
+           border border-white/50;
+  }
+}
+
+/* Animations */
+@layer utilities {
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-out forwards;
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.6s ease-out forwards;
+  }
+
+  .animate-scale-in {
+    animation: scaleIn 0.4s ease-out forwards;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Decorative Elements */
+@layer components {
+  .gold-accent {
+    @apply text-gold;
+  }
+
+  .gold-underline {
+    @apply relative inline-block;
+  }
+
+  .gold-underline::after {
+    content: '';
+    @apply absolute bottom-0 left-0 w-full h-0.5 bg-gold;
+  }
+
+  .divider {
+    @apply w-16 h-0.5 bg-gold mx-auto;
+  }
+
+  .divider-long {
+    @apply w-32 h-px bg-light-gray mx-auto;
+  }
+}
+
+/* Container */
+@layer components {
+  .container-luxury {
+    @apply max-w-7xl mx-auto px-6 md:px-8 lg:px-12;
+  }
+}
