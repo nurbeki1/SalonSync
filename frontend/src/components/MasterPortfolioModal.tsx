@@ -25,18 +25,19 @@ export default function MasterPortfolioModal({
   const [error, setError] = useState("");
   const [lightbox, setLightbox] = useState<MasterPortfolioPhoto | null>(null);
 
+  const loadErrorMsg =
+    locale === "kk" ? "Жүктеу сәтсіз аяқталды" : "Не удалось загрузить";
+
   const t =
     locale === "kk"
       ? {
           title: "Портфолио",
           empty: "Портфолио әлі қосылмаған",
-          loadError: "Жүктеу сәтсіз аяқталды",
           close: "Жабу",
         }
       : {
           title: "Портфолио",
           empty: "Портфолио ещё не добавлено",
-          loadError: "Не удалось загрузить",
           close: "Закрыть",
         };
 
@@ -50,7 +51,7 @@ export default function MasterPortfolioModal({
         const data = await getMasterPortfolio(master.id);
         if (!cancelled) setPhotos(data);
       } catch {
-        if (!cancelled) setError(t.loadError);
+        if (!cancelled) setError(loadErrorMsg);
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -59,7 +60,7 @@ export default function MasterPortfolioModal({
     return () => {
       cancelled = true;
     };
-  }, [isOpen, master.id, t.loadError]);
+  }, [isOpen, master.id, loadErrorMsg]);
 
   useEffect(() => {
     if (!isOpen) return;

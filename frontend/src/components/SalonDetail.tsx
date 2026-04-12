@@ -35,6 +35,11 @@ export default function SalonDetail({ salon, onClose, onBooking, locale }: Salon
   const [error, setError] = useState("");
   const [showAllServices, setShowAllServices] = useState(false);
 
+  const loadErrorMsg =
+    locale === "kk"
+      ? "Деректерді жүктеу сәтсіз"
+      : "Не удалось загрузить данные";
+
   const t =
     locale === "kk"
       ? {
@@ -44,7 +49,6 @@ export default function SalonDetail({ salon, onClose, onBooking, locale }: Salon
           masters: "Мастерлер",
           showAll: "Барлығын көру",
           book: "Жазылу",
-          loadError: "Деректерді жүктеу сәтсіз",
           noGallery: "Галереяда фото жоқ",
         }
       : {
@@ -54,7 +58,6 @@ export default function SalonDetail({ salon, onClose, onBooking, locale }: Salon
           masters: "Мастера",
           showAll: "Показать все",
           book: "Записаться",
-          loadError: "Не удалось загрузить данные",
           noGallery: "Нет фото в галерее",
         };
 
@@ -75,7 +78,7 @@ export default function SalonDetail({ salon, onClose, onBooking, locale }: Salon
           setMasters(m);
         }
       } catch {
-        if (!cancelled) setError(t.loadError);
+        if (!cancelled) setError(loadErrorMsg);
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -84,7 +87,7 @@ export default function SalonDetail({ salon, onClose, onBooking, locale }: Salon
     return () => {
       cancelled = true;
     };
-  }, [salon.id, t.loadError]);
+  }, [salon.id, loadErrorMsg]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {

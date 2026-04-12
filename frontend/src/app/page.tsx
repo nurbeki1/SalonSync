@@ -17,10 +17,13 @@ import {
   Search,
   Building2,
   RefreshCw,
+  User,
 } from "lucide-react";
 import { getSalons, Salon } from "@/lib/api";
 import SalonCard from "@/components/SalonCard";
+import SalonDetail from "@/components/SalonDetail";
 import BookingDrawer from "@/components/BookingDrawer";
+import MyBookingsModal from "@/components/MyBookingsModal";
 import BrandLogo from "@/components/BrandLogo";
 import { DEFAULT_LOCALE, localeLabels, type Locale } from "@/lib/i18n";
 
@@ -86,6 +89,7 @@ function BeautyHeroVisual() {
 // Header Component
 function Header({
   onBookingClick,
+  onMyBookingsClick,
   activeSection,
   locale,
   onLocaleChange,
@@ -93,6 +97,7 @@ function Header({
   logoAnchorRef,
 }: {
   onBookingClick: () => void;
+  onMyBookingsClick: () => void;
   activeSection: "salons" | "about" | "contacts";
   locale: Locale;
   onLocaleChange: (locale: Locale) => void;
@@ -171,6 +176,14 @@ function Header({
 
             {/* CTA Button */}
             <div className="hidden md:flex items-center gap-3">
+              <button
+                type="button"
+                onClick={onMyBookingsClick}
+                className="btn-ghost text-sm font-medium"
+              >
+                <User className="w-4 h-4" />
+                {locale === "kk" ? "Менің жазылуларым" : "Мои записи"}
+              </button>
               <div className="bg-white/80 border border-light-gray rounded-full p-1 flex items-center">
                 {(["ru", "kk"] as Locale[]).map((lang) => (
                   <button
@@ -245,6 +258,17 @@ function Header({
           >
             {locale === "kk" ? "Байланыс" : "Контакты"}
           </a>
+          <button
+            type="button"
+            onClick={() => {
+              setIsMenuOpen(false);
+              onMyBookingsClick();
+            }}
+            className="font-sans text-lg font-medium py-2 text-left flex items-center gap-2"
+          >
+            <User className="w-5 h-5" />
+            {locale === "kk" ? "Менің жазылуларым" : "Мои записи"}
+          </button>
           <div className="bg-white/80 border border-light-gray rounded-full p-1 flex items-center w-fit">
             {(["ru", "kk"] as Locale[]).map((lang) => (
               <button
@@ -852,6 +876,8 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [selectedSalon, setSelectedSalon] = useState<Salon | null>(null);
+  const [showSalonDetail, setShowSalonDetail] = useState(false);
+  const [showMyBookings, setShowMyBookings] = useState(false);
   const [activeSection, setActiveSection] = useState<"salons" | "about" | "contacts">(
     "salons"
   );
@@ -991,6 +1017,7 @@ export default function HomePage() {
 
   const handleSelectSalon = (salon: Salon) => {
     setSelectedSalon(salon);
+    setShowSalonDetail(true);
   };
 
   if (loading) {
@@ -1067,6 +1094,7 @@ export default function HomePage() {
       >
       <Header
         onBookingClick={handleExploreClick}
+        onMyBookingsClick={() => setShowMyBookings(true)}
         activeSection={activeSection}
         locale={locale}
         onLocaleChange={setLocale}
@@ -1102,14 +1130,39 @@ export default function HomePage() {
       <ContactsSection locale={locale} />
       <Footer locale={locale} />
 
-      {/* Booking Drawer */}
-      {selectedSalon && (
-        <BookingDrawer
+      {selectedSalon && showSalonDetail && (
+        <SalonDetail
           salon={selectedSalon}
-          onClose={() => setSelectedSalon(null)}
+          onClose={() => {
+            setSelectedSalon(null);
+            setShowSalonDetail(false);
+          }}
+          onBooking={() => setShowSalonDetail(false)}
           locale={locale}
         />
       )}
+
+      {selectedSalon && !showSalonDetail && (
+        <BookingDrawer
+          salon={selectedSalon}
+          onClose={() => {
+            setSelectedSalon(null);
+            setShowSalonDetail(false);
+          }}
+          locale={locale}
+          onOpenMyBookings={() => setShowMyBookings(true)}
+        />
+      )}
+
+      <MyBookingsModal
+        isOpen={showMyBookings}
+        onClose={() => setShowMyBookings(false)}
+        locale={locale}
+        onOpenBooking={() => {
+          setShowMyBookings(false);
+          document.getElementById("salons")?.scrollIntoView({ behavior: "smooth" });
+        }}
+      />
       </motion.main>
     </>
   );
