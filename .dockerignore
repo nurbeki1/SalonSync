@@ -1,0 +1,11 @@
+.git
+**/node_modules
+frontend/.next
+**/.venv
+**/venv
+**/__pycache__
+**/*.pyc
+**/.env
+**/*.db
+*.md
+.cursor

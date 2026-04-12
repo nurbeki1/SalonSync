@@ -1,16 +1,26 @@
+import logging
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from database import engine, Base
+
+logger = logging.getLogger(__name__)
 from models import (
     Service, Master, MasterService, MasterSchedule, Client, Booking,
     Salon, SalonService, SalonGallery, MasterPortfolio, OTPCode
 )
 from routers import services, masters, bookings, salons
 from routers import salon_gallery, my_bookings
+from init_salons import init_database
 
 # Create database tables
 Base.metadata.create_all(bind=engine)
+# Демо-каталог при пустой БД; не роняем весь процесс, если сид не удался (Railway / лимиты памяти)
+try:
+    init_database()
+except Exception:
+    logger.exception("init_database failed; API starts without seeded catalog")
 
 app = FastAPI(
     title="SalonSync - Beauty Salon Aggregator API",

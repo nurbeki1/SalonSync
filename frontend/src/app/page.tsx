@@ -1110,12 +1110,12 @@ export default function HomePage() {
           <div className="container-luxury">
             <div className="card-elevated max-w-xl mx-auto text-center">
               <h2 className="heading-sm mb-3">
-                {locale === "kk" ? "Қолжетімді салондар әзірге жоқ" : "Пока нет доступных салонов"}
+                {locale === "kk" ? "Каталогта белсенді салондар жоқ" : "В каталоге пока нет салонов"}
               </h2>
               <p className="body-sm text-graphite/70 mb-6">
                 {locale === "kk"
-                  ? "Каталог жаңартылып жатыр. Бірнеше минуттан кейін қайталап көріңіз."
-                  : "Мы обновляем каталог. Попробуйте через пару минут."}
+                  ? "Деректер жүктелмесе, «Жаңарту» батырмасын басыңыз немесе кейінірек қайта көріңіз."
+                  : "Нажмите «Обновить», чтобы запросить список снова. Если салонов нет и позже — возможно, каталог ещё не наполнен на сервере."}
               </p>
               <button onClick={loadData} className="btn-secondary">
                 <RefreshCw className="w-4 h-4" />

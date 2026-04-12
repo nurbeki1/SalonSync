@@ -2,6 +2,7 @@
 Скрипт инициализации базы данных с салонами Алматы.
 Запуск: python init_salons.py
 """
+import sys
 from decimal import Decimal
 from datetime import date, time, timedelta
 from database import SessionLocal, engine, Base
@@ -224,6 +225,12 @@ SALON_SERVICE_MAPPING = {
 
 
 def init_database():
+    # Windows-консоль (cp1251): иначе print() падает на названиях вроде «ÉSTA»
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    if hasattr(sys.stderr, "reconfigure"):
+        sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+
     db = SessionLocal()
 
     try:
