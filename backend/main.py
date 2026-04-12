@@ -13,6 +13,7 @@ from models import (
 from routers import services, masters, bookings, salons
 from routers import salon_gallery, my_bookings
 from init_salons import init_database
+from config import CORS_MODE, CORS_ORIGINS, CORS_ORIGIN_REGEX
 
 # Create database tables
 Base.metadata.create_all(bind=engine)
@@ -28,14 +29,25 @@ app = FastAPI(
     version="2.0.0"
 )
 
-# CORS configuration
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:3001"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# CORS: по умолчанию open — любой сайт может вызывать API (fetch без credentials).
+# Строгий список: Railway → Variables → CORS_MODE=strict и задайте CORS_ORIGINS.
+if CORS_MODE == "strict":
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=CORS_ORIGINS,
+        allow_origin_regex=CORS_ORIGIN_REGEX,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+else:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=False,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
 # Include routers
 app.include_router(salons.router)

@@ -21,3 +21,22 @@ WHATSAPP_SESSION = os.getenv("WHATSAPP_SESSION", "default")
 
 # JWT (for OTP verification)
 JWT_SECRET = os.getenv("JWT_SECRET", "salonsync-secret-key-change-in-production")
+
+# CORS: через запятую (для CORS_MODE=strict). Пример: https://app.vercel.app,http://localhost:3000
+_cors_raw = os.getenv(
+    "CORS_ORIGINS",
+    "http://localhost:3000,http://localhost:3001",
+)
+CORS_ORIGINS = [o.strip() for o in _cors_raw.split(",") if o.strip()]
+if not CORS_ORIGINS:
+    CORS_ORIGINS = ["http://localhost:3000", "http://localhost:3001"]
+
+# strict: только список + regex; open (по умолчанию): любой Origin (без cookies — как у fetch во фронте)
+CORS_MODE = os.getenv("CORS_MODE", "open").strip().lower()
+
+# fullmatch() на заголовок Origin; покрывает все *.vercel.app и localhost с портом
+if "CORS_ORIGIN_REGEX" in os.environ:
+    _rx = os.environ["CORS_ORIGIN_REGEX"].strip()
+    CORS_ORIGIN_REGEX: str | None = _rx if _rx else None
+else:
+    CORS_ORIGIN_REGEX = r"^https://.+\.vercel\.app$|^http://localhost(:\d+)?$"
