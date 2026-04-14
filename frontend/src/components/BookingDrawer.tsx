@@ -705,9 +705,10 @@ export default function BookingDrawer({ salon, onClose, locale, onOpenMyBookings
                           <button
                             type="button"
                             onClick={() => setPortfolioMaster(master)}
-                            className="mt-3 font-sans text-sm text-graphite underline underline-offset-2"
+                            className="mt-3 w-full flex items-center justify-between border-t border-light-gray pt-3 font-sans text-sm text-graphite/80 transition hover:text-graphite"
                           >
-                            {t.portfolio}
+                            <span>{t.portfolio}</span>
+                            <ArrowRight className="w-4 h-4 opacity-60" />
                           </button>
                         </motion.div>
                       ))}

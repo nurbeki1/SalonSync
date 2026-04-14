@@ -85,14 +85,14 @@ export default function MasterPortfolioModal({
         exit={{ opacity: 0 }}
       >
         <motion.div
-          className="absolute inset-0 modal-overlay"
+          className="absolute inset-0 bg-graphite/40 backdrop-blur-sm"
           onClick={onClose}
           aria-hidden="true"
         />
         <motion.div
           role="dialog"
           aria-modal="true"
-          className="relative w-full max-w-lg max-h-[90vh] bg-bone rounded-t-3xl sm:rounded-3xl shadow-2xl border border-light-gray overflow-hidden flex flex-col"
+          className="relative z-[1] w-full max-w-lg max-h-[90vh] bg-bone rounded-t-3xl sm:rounded-3xl shadow-2xl border border-light-gray overflow-hidden flex flex-col"
           initial={{ y: "100%", opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: "100%", opacity: 0 }}
