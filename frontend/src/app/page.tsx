@@ -912,36 +912,10 @@ export default function HomePage() {
       setLocale(savedLocale);
     }
 
-    const introSeen = window.sessionStorage.getItem("intro_seen");
-    if (introSeen === "1") {
-      setIntroComplete(true);
-      setIntroStage("done");
-      return;
-    }
-
-    setShowIntro(true);
-    setIntroStage("hold");
-
-    const moveTimer = window.setTimeout(() => {
-      setIntroStage("move");
-    }, 3000);
-
-    const typingStartTimer = window.setTimeout(() => {
-      setIntroStage("typing");
-      setIntroComplete(true);
-    }, 3900);
-
-    const hideIntroTimer = window.setTimeout(() => {
-      setIntroStage("done");
-      setShowIntro(false);
-      window.sessionStorage.setItem("intro_seen", "1");
-    }, 5700);
-
-    return () => {
-      window.clearTimeout(moveTimer);
-      window.clearTimeout(typingStartTimer);
-      window.clearTimeout(hideIntroTimer);
-    };
+    // Disable first-visit logo intro animation.
+    setShowIntro(false);
+    setIntroStage("done");
+    setIntroComplete(true);
   }, []);
 
   useEffect(() => {

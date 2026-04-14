@@ -15,6 +15,16 @@ ADMIN_CHAT_ID = os.getenv("ADMIN_CHAT_ID", "")
 # Kaspi Payment
 KASPI_PHONE = os.getenv("KASPI_PHONE", "77001234567")  # Номер для приёма платежей
 
+# CORS (comma-separated list)
+FRONTEND_ORIGINS = [
+    origin.strip()
+    for origin in os.getenv(
+        "FRONTEND_ORIGINS",
+        "http://localhost:3000,http://localhost:3001,https://salon-sync-psi.vercel.app",
+    ).split(",")
+    if origin.strip()
+]
+
 # WhatsApp (WAHA API)
 WHATSAPP_API_URL = os.getenv("WHATSAPP_API_URL", "")  # e.g. http://localhost:3002
 WHATSAPP_SESSION = os.getenv("WHATSAPP_SESSION", "default")
