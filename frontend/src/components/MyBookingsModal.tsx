@@ -281,11 +281,11 @@ export default function MyBookingsModal({
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
       >
-        <motion.div className="absolute inset-0 modal-overlay" onClick={onClose} aria-hidden />
+        <motion.div className="absolute inset-0 bg-black/45" onClick={onClose} aria-hidden />
         <motion.div
           role="dialog"
           aria-modal="true"
-          className="relative modal-content w-full max-w-lg max-h-[90vh] overflow-hidden flex flex-col"
+          className="relative w-full max-w-lg max-h-[90vh] overflow-hidden flex flex-col bg-white rounded-3xl shadow-2xl border border-light-gray"
           initial={{ scale: 0.96, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.96, opacity: 0 }}

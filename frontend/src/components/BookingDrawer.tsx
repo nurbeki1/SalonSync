@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
+import Image from "next/image";
 import {
   X,
   Calendar,
@@ -994,10 +995,13 @@ export default function BookingDrawer({ salon, onClose, locale, onOpenMyBookings
                       transition={{ delay: 0.3 }}
                       className="bg-white rounded-2xl p-6 mb-6 inline-block shadow-soft"
                     >
-                      <img
+                      <Image
                         src={`data:image/png;base64,${payment.qr_code_base64}`}
                         alt="QR код для оплаты через Kaspi"
                         className="w-48 h-48 mx-auto"
+                        width={192}
+                        height={192}
+                        unoptimized
                       />
                     </motion.div>
                   )}

@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Image from "next/image";
 import { Star, MapPin, Clock, ChevronRight, Sparkles } from "lucide-react";
 import type { Salon } from "@/lib/api";
 import type { Locale } from "@/lib/i18n";
@@ -49,23 +50,25 @@ export default function SalonCard({ salon, onSelect, index, locale }: SalonCardP
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.55, delay: index * 0.12, ease: "easeOut" }}
-      whileHover={{ y: -10 }}
+      whileHover={{ y: -8 }}
     >
       <motion.button
         type="button"
         onClick={() => onSelect(salon)}
         aria-label={`${t.openBooking} в ${salon.name}`}
-        className="relative bg-white rounded-[28px] overflow-hidden border border-black/10 shadow-soft hover:shadow-card transition-all duration-300 cursor-pointer group text-left w-full"
-        whileHover={{ scale: 1.015, rotateX: 1.2, rotateY: -1.2 }}
+        className="relative bg-white rounded-[28px] overflow-hidden border border-black/10 shadow-soft hover:shadow-card transition-all duration-300 cursor-pointer group text-left w-full [transform:translateZ(0)] [backface-visibility:hidden]"
+        whileHover={{ scale: 1.01 }}
         transition={{ type: "spring", stiffness: 290, damping: 22 }}
       >
         {/* Image */}
-        <div className="relative aspect-[4/3] overflow-hidden bg-neutral-100">
+        <div className="relative aspect-[4/3] overflow-hidden rounded-t-[28px] bg-neutral-100">
           {salon.image_url ? (
-            <img
+            <Image
               src={salon.image_url}
               alt={salon.name}
-              className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+              className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03] [transform:translateZ(0)] [backface-visibility:hidden]"
+              fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             />
           ) : (
             <div className="absolute inset-0 bg-gradient-to-br from-[#F8F8F8] via-[#F1F1F1] to-[#E8E8E8]">

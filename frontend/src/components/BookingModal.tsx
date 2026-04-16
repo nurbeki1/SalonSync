@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { X, Calendar, Clock, User, Phone, Loader2, CheckCircle, ExternalLink } from "lucide-react";
 import type { Service, Master, TimeSlot, PaymentResponse } from "@/lib/api";
 import { getMastersByService, getAvailableSlots, createBooking, getPaymentLink } from "@/lib/api";
@@ -40,7 +41,7 @@ export default function BookingModal({ service, onClose }: BookingModalProps) {
       try {
         const data = await getMastersByService(service.id);
         setMasters(data);
-      } catch (err) {
+      } catch {
         setError("Не удалось загрузить мастеров");
       } finally {
         setLoading(false);
@@ -59,7 +60,7 @@ export default function BookingModal({ service, onClose }: BookingModalProps) {
       try {
         const data = await getAvailableSlots(selectedMaster!.id, service.id, selectedDate);
         setSlots(data.slots);
-      } catch (err) {
+      } catch {
         setError("Не удалось загрузить доступное время");
       } finally {
         setLoading(false);
@@ -330,10 +331,13 @@ export default function BookingModal({ service, onClose }: BookingModalProps) {
               {/* QR Code */}
               {payment.qr_code_base64 && (
                 <div className="bg-white rounded-xl p-4 mb-4 inline-block border border-gray-200">
-                  <img
+                  <Image
                     src={`data:image/png;base64,${payment.qr_code_base64}`}
                     alt="QR код для оплаты через Kaspi"
                     className="w-48 h-48 mx-auto"
+                    width={192}
+                    height={192}
+                    unoptimized
                   />
                 </div>
               )}

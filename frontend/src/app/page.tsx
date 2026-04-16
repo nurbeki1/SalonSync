@@ -573,12 +573,64 @@ function SalonsSection({
           )}
         </motion.div>
 
+        <div className="md:hidden mb-3 flex items-center justify-between">
+          <p className="font-sans text-sm text-graphite/55">
+            {locale === "kk" ? "Салонды жанай сырғытып таңдаңыз" : "Листайте салоны свайпом"}
+          </p>
+          <span className="font-sans text-xs text-graphite/40">
+            {salons.length} {locale === "kk" ? "салон" : "салонов"}
+          </span>
+        </div>
+
         <motion.div
           variants={staggerContainer}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 [perspective:1000px]"
+          className="md:hidden -mx-4 px-4 pb-2 flex gap-4 overflow-x-auto snap-x snap-mandatory [scrollbar-width:none] [-ms-overflow-style:none]"
+        >
+          {salons.map((salon, index) => (
+            <motion.button
+              key={salon.id}
+              type="button"
+              onClick={() => onSelectSalon(salon)}
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: index * 0.04 }}
+              className="snap-start shrink-0 w-[84vw] max-w-[340px] text-left bg-white rounded-2xl border border-black/10 shadow-soft p-4"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <h3 className="font-sans text-base font-semibold text-graphite leading-tight">
+                  {salon.name}
+                </h3>
+                <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-graphite/5 border border-black/5 text-xs font-semibold text-graphite whitespace-nowrap">
+                  <Star className="w-3.5 h-3.5 fill-graphite" />
+                  {salon.rating}
+                </span>
+              </div>
+              {salon.address && (
+                <p className="mt-2 text-sm text-graphite/60 line-clamp-1">{salon.address}</p>
+              )}
+              {salon.description && (
+                <p className="mt-2 text-sm text-graphite/60 line-clamp-2">{salon.description}</p>
+              )}
+              <div className="mt-4 pt-3 border-t border-black/10 flex items-center justify-between">
+                <span className="text-sm font-medium text-graphite/80">
+                  {locale === "kk" ? "Толығырақ" : "Подробнее"}
+                </span>
+                <ChevronRight className="w-4 h-4 text-graphite/70" />
+              </div>
+            </motion.button>
+          ))}
+        </motion.div>
+
+        <motion.div
+          variants={staggerContainer}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          className="hidden md:grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
         >
           {salons.map((salon, index) => (
             <SalonCard
