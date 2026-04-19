@@ -1,4 +1,4 @@
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8001";
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8000";
 
 export interface Salon {
   id: number;
@@ -200,6 +200,15 @@ export async function getPaymentLink(bookingId: number): Promise<PaymentResponse
     method: "POST",
   });
   if (!res.ok) throw new Error("Failed to get payment link");
+  return res.json();
+}
+
+// Подтвердить оплату (мок — уведомляет мастера и меняет статус на PAID)
+export async function confirmPayment(bookingId: number): Promise<BookingResponse> {
+  const res = await fetch(`${API_BASE}/bookings/${bookingId}/confirm-payment`, {
+    method: "POST",
+  });
+  if (!res.ok) throw new Error("Failed to confirm payment");
   return res.json();
 }
 

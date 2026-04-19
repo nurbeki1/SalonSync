@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
-import Image from "next/image";
 import {
   X,
   Calendar,
@@ -11,12 +10,13 @@ import {
   Phone,
   Loader2,
   CheckCircle,
-  ExternalLink,
   Sparkles,
   Star,
   ChevronLeft,
   CreditCard,
   ArrowRight,
+  BadgeCheck,
+  Receipt,
 } from "lucide-react";
 import type { Salon, Service, Master, TimeSlot, PaymentResponse, BookingResponse } from "@/lib/api";
 import {
@@ -26,6 +26,7 @@ import {
   getAvailableDates,
   createBooking,
   getPaymentLink,
+  confirmPayment,
 } from "@/lib/api";
 import type { Locale } from "@/lib/i18n";
 import CalendarPicker from "@/components/CalendarPicker";
@@ -159,6 +160,8 @@ export default function BookingDrawer({ salon, onClose, locale, onOpenMyBookings
   const [loading, setLoading] = useState(false);
   const [payment, setPayment] = useState<PaymentResponse | null>(null);
   const [createdBooking, setCreatedBooking] = useState<BookingResponse | null>(null);
+  const [paymentDone, setPaymentDone] = useState(false);
+  const [payingLoading, setPayingLoading] = useState(false);
   const [calendarMonth, setCalendarMonth] = useState(() => {
     const d = new Date();
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
@@ -171,10 +174,7 @@ export default function BookingDrawer({ salon, onClose, locale, onOpenMyBookings
     ? {
         close: "Жабу",
         bookingCreated: "Жазылу жасалды!",
-        payWithKaspi: "Kaspi қосымшасымен QR-кодты сканерлеп төлеңіз",
-        openKaspi: "Kaspi-ді ашу",
         closeBookingModal: "Жазылу терезесін жабу",
-        whatsappNote: "📱 WhatsApp-қа растау хабарламасы жіберілді",
         myBookings: "Менің жазылуларым",
         backServices: "Қызметтерге оралу",
         backMasters: "Мастерлерге оралу",
@@ -195,17 +195,22 @@ export default function BookingDrawer({ salon, onClose, locale, onOpenMyBookings
         phone: "Телефон",
         creating: "Жазылу жасалуда...",
         toPay: "Төлемге өту",
-        afterPay: "Төлемнен кейін скриншотты мастерге жіберіңіз",
         salon: "Салон",
         address: "Мекенжай",
+        payTitle: "Төлем",
+        paySubtitle: "Сіздің жазылуыңыз расталды. Төлемді жасаңыз.",
+        payBtn: "Төлеу",
+        payingBtn: "Өңделуде...",
+        receiptTitle: "Төлем өтті!",
+        receiptSubtitle: "Мастерге хабарлама жіберілді",
+        receiptLabel: "Чек",
+        bookingId: "Жазылу №",
+        total: "Жалпы сома",
       }
     : {
         close: "Закрыть",
         bookingCreated: "Запись создана!",
-        payWithKaspi: "Отсканируйте QR-код в приложении Kaspi для оплаты",
-        openKaspi: "Открыть в Kaspi",
         closeBookingModal: "Закрыть окно записи",
-        whatsappNote: "📱 Сообщение с подтверждением отправлено в WhatsApp",
         myBookings: "Мои записи",
         backServices: "Назад к услугам",
         backMasters: "Назад к мастерам",
@@ -226,9 +231,17 @@ export default function BookingDrawer({ salon, onClose, locale, onOpenMyBookings
         phone: "Телефон",
         creating: "Создание записи...",
         toPay: "Перейти к оплате",
-        afterPay: "После оплаты отправьте скриншот мастеру",
         salon: "Салон",
         address: "Адрес",
+        payTitle: "Оплата",
+        paySubtitle: "Ваша запись подтверждена. Произведите оплату.",
+        payBtn: "Оплатить",
+        payingBtn: "Обработка...",
+        receiptTitle: "Оплата прошла!",
+        receiptSubtitle: "Мастер получил уведомление об оплате",
+        receiptLabel: "Чек об оплате",
+        bookingId: "Запись №",
+        total: "Итого",
       };
 
   // Load services on mount
@@ -931,123 +944,211 @@ export default function BookingDrawer({ salon, onClose, locale, onOpenMyBookings
 
               {/* Step 5: Payment */}
               {step === "payment" && payment && (
-                <motion.div
-                  key="payment"
-                  variants={contentVariants}
-                  initial="hidden"
-                  animate="visible"
-                  exit="exit"
-                  className="text-center"
-                >
-                  {/* Success Icon */}
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ type: "spring", delay: 0.2 }}
-                    className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4"
-                  >
-                    <CheckCircle className="w-10 h-10 text-green-500" />
-                  </motion.div>
-
-                  <h3 className="font-serif text-2xl font-bold text-graphite mb-2">
-                    {t.bookingCreated}
-                  </h3>
-                  <p className="font-sans text-graphite/60 mb-2">{t.payWithKaspi}</p>
-                  <p className="font-sans text-sm text-graphite/55 mb-4">{t.whatsappNote}</p>
-
-                  <div className="text-left bg-graphite/5 rounded-xl p-4 mb-6 font-sans text-sm text-graphite/80 space-y-1">
-                    <p>
-                      <span className="text-graphite/50">{t.salon}:</span> {salon.name}
-                    </p>
-                    {salon.address && (
-                      <p>
-                        <span className="text-graphite/50">{t.address}:</span> {salon.address}
-                      </p>
-                    )}
-                    <p>
-                      <span className="text-graphite/50">{t.master}:</span> {selectedMaster?.name}
-                    </p>
-                    <p>
-                      <span className="text-graphite/50">{t.service}:</span>{" "}
-                      {selectedService && localizeServiceText(selectedService.name, locale)}
-                    </p>
-                    <p>
-                      <span className="text-graphite/50">{t.date}:</span>{" "}
-                      {selectedDate && formatDate(selectedDate)}
-                    </p>
-                    <p>
-                      <span className="text-graphite/50">{t.time}:</span>{" "}
-                      {selectedSlot && formatTime(selectedSlot.start_time)}
-                    </p>
-                    <p className="font-semibold text-graphite pt-1">
-                      {t.price}: {parseInt(payment.amount, 10).toLocaleString()} ₸
-                    </p>
-                    {createdBooking && (
-                      <p className="text-xs text-graphite/45">#{createdBooking.id}</p>
-                    )}
-                  </div>
-
-                  {/* QR Code */}
-                  {payment.qr_code_base64 && (
+                <AnimatePresence mode="wait">
+                  {!paymentDone ? (
+                    /* ── Экран оплаты ── */
                     <motion.div
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: 0.3 }}
-                      className="bg-white rounded-2xl p-6 mb-6 inline-block shadow-soft"
+                      key="pay-screen"
+                      variants={contentVariants}
+                      initial="hidden"
+                      animate="visible"
+                      exit="exit"
+                      className="flex flex-col items-center"
                     >
-                      <Image
-                        src={`data:image/png;base64,${payment.qr_code_base64}`}
-                        alt="QR код для оплаты через Kaspi"
-                        className="w-48 h-48 mx-auto"
-                        width={192}
-                        height={192}
-                        unoptimized
-                      />
+                      {/* Иконка */}
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ type: "spring", delay: 0.15 }}
+                        className="w-20 h-20 bg-graphite/8 rounded-full flex items-center justify-center mb-5"
+                      >
+                        <CreditCard className="w-10 h-10 text-graphite/70" />
+                      </motion.div>
+
+                      <h3 className="font-serif text-2xl font-bold text-graphite mb-1">
+                        {t.payTitle}
+                      </h3>
+                      <p className="font-sans text-sm text-graphite/55 mb-6 text-center">
+                        {t.paySubtitle}
+                      </p>
+
+                      {/* Детали записи */}
+                      <div className="w-full bg-white rounded-2xl border border-light-gray/80 p-4 mb-5 font-sans text-sm text-graphite/80 space-y-2">
+                        <div className="flex justify-between">
+                          <span className="text-graphite/50">{t.service}</span>
+                          <span className="font-medium text-right">
+                            {selectedService && localizeServiceText(selectedService.name, locale)}
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-graphite/50">{t.master}</span>
+                          <span className="font-medium">{selectedMaster?.name}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-graphite/50">{t.date}</span>
+                          <span className="font-medium">{selectedDate && formatDate(selectedDate)}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-graphite/50">{t.time}</span>
+                          <span className="font-medium">{selectedSlot && formatTime(selectedSlot.start_time)}</span>
+                        </div>
+                        <div className="flex justify-between pt-2 border-t border-light-gray">
+                          <span className="text-graphite/50">{t.salon}</span>
+                          <span className="font-medium">{salon.name}</span>
+                        </div>
+                      </div>
+
+                      {/* Сумма */}
+                      <div className="w-full bg-graphite rounded-2xl p-5 mb-6 text-center">
+                        <p className="font-sans text-sm text-bone/60 mb-1">{t.total}</p>
+                        <p className="font-serif text-4xl font-bold text-bone">
+                          {parseInt(payment.amount).toLocaleString()} ₸
+                        </p>
+                      </div>
+
+                      {/* Кнопка оплатить */}
+                      <motion.button
+                        type="button"
+                        disabled={payingLoading}
+                        onClick={async () => {
+                          if (!createdBooking) return;
+                          setPayingLoading(true);
+                          try {
+                            await confirmPayment(createdBooking.id);
+                            setPaymentDone(true);
+                          } catch {
+                            setError("Ошибка при обработке оплаты");
+                          } finally {
+                            setPayingLoading(false);
+                          }
+                        }}
+                        className="w-full py-4 bg-graphite text-bone font-serif font-bold rounded-xl hover:bg-black transition disabled:opacity-60 flex items-center justify-center gap-2 shadow-soft"
+                        whileHover={{ scale: payingLoading ? 1 : 1.02 }}
+                        whileTap={{ scale: payingLoading ? 1 : 0.98 }}
+                      >
+                        {payingLoading ? (
+                          <>
+                            <Loader2 className="w-5 h-5 animate-spin" />
+                            {t.payingBtn}
+                          </>
+                        ) : (
+                          <>
+                            <CreditCard className="w-5 h-5" />
+                            {t.payBtn}
+                          </>
+                        )}
+                      </motion.button>
+                    </motion.div>
+                  ) : (
+                    /* ── Чек об оплате ── */
+                    <motion.div
+                      key="receipt-screen"
+                      variants={contentVariants}
+                      initial="hidden"
+                      animate="visible"
+                      exit="exit"
+                      className="flex flex-col items-center"
+                    >
+                      {/* Анимированная галочка */}
+                      <motion.div
+                        initial={{ scale: 0, rotate: -30 }}
+                        animate={{ scale: 1, rotate: 0 }}
+                        transition={{ type: "spring", stiffness: 260, damping: 18, delay: 0.1 }}
+                        className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mb-5"
+                      >
+                        <BadgeCheck className="w-12 h-12 text-green-500" />
+                      </motion.div>
+
+                      <h3 className="font-serif text-2xl font-bold text-graphite mb-1">
+                        {t.receiptTitle}
+                      </h3>
+                      <p className="font-sans text-sm text-graphite/55 mb-6 text-center">
+                        {t.receiptSubtitle}
+                      </p>
+
+                      {/* Чек */}
+                      <motion.div
+                        initial={{ opacity: 0, y: 16 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.25 }}
+                        className="w-full bg-white rounded-2xl border border-light-gray/80 overflow-hidden mb-6"
+                      >
+                        {/* Шапка чека */}
+                        <div className="bg-graphite/5 px-4 py-3 flex items-center gap-2 border-b border-light-gray/60">
+                          <Receipt className="w-4 h-4 text-graphite/60" />
+                          <span className="font-sans text-sm font-semibold text-graphite/70">
+                            {t.receiptLabel}
+                          </span>
+                          {createdBooking && (
+                            <span className="ml-auto font-sans text-xs text-graphite/40">
+                              {t.bookingId}{createdBooking.id}
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Строки чека */}
+                        <div className="px-4 py-3 font-sans text-sm space-y-2.5">
+                          <div className="flex justify-between">
+                            <span className="text-graphite/50">{t.salon}</span>
+                            <span className="font-medium">{salon.name}</span>
+                          </div>
+                          {salon.address && (
+                            <div className="flex justify-between">
+                              <span className="text-graphite/50">{t.address}</span>
+                              <span className="font-medium text-right max-w-[55%]">{salon.address}</span>
+                            </div>
+                          )}
+                          <div className="flex justify-between">
+                            <span className="text-graphite/50">{t.master}</span>
+                            <span className="font-medium">{selectedMaster?.name}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-graphite/50">{t.service}</span>
+                            <span className="font-medium text-right max-w-[55%]">
+                              {selectedService && localizeServiceText(selectedService.name, locale)}
+                            </span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-graphite/50">{t.date}</span>
+                            <span className="font-medium">{selectedDate && formatDate(selectedDate)}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-graphite/50">{t.time}</span>
+                            <span className="font-medium">{selectedSlot && formatTime(selectedSlot.start_time)}</span>
+                          </div>
+
+                          {/* Итого */}
+                          <div className="flex justify-between items-center pt-3 border-t border-light-gray mt-1">
+                            <span className="font-serif font-bold text-graphite">{t.total}</span>
+                            <span className="font-serif text-xl font-bold text-graphite">
+                              {parseInt(payment.amount).toLocaleString()} ₸
+                            </span>
+                          </div>
+                        </div>
+                      </motion.div>
+
+                      {onOpenMyBookings && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            onClose();
+                            onOpenMyBookings();
+                          }}
+                          className="w-full py-3 bg-graphite text-bone font-serif font-semibold rounded-xl hover:bg-black transition mb-3"
+                        >
+                          {t.myBookings}
+                        </button>
+                      )}
+
+                      <button
+                        onClick={onClose}
+                        className="font-sans text-sm text-graphite/50 hover:text-graphite transition"
+                      >
+                        {t.close}
+                      </button>
                     </motion.div>
                   )}
-
-                  {/* Amount */}
-                  <div className="bg-graphite/5 rounded-xl p-4 mb-6">
-                    <p className="font-serif text-3xl font-bold text-graphite">
-                      {parseInt(payment.amount).toLocaleString()} ₸
-                    </p>
-                    <p className="font-sans text-sm text-graphite/50 mt-1">{t.afterPay}</p>
-                  </div>
-
-                  {/* Kaspi Button */}
-                  <motion.a
-                    href={payment.kaspi_link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 px-6 py-3 bg-[#F14635] text-white font-semibold rounded-xl hover:bg-[#d93d2e] transition shadow-soft"
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    <ExternalLink className="w-5 h-5" />
-                    {t.openKaspi}
-                  </motion.a>
-
-                  {onOpenMyBookings && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        onClose();
-                        onOpenMyBookings();
-                      }}
-                      className="block w-full mt-4 font-sans text-sm font-medium text-graphite underline"
-                    >
-                      {t.myBookings}
-                    </button>
-                  )}
-
-                  {/* Close Button */}
-                  <button
-                    onClick={onClose}
-                    className="block w-full mt-6 font-sans text-graphite/50 hover:text-graphite transition"
-                  >
-                    {t.close}
-                  </button>
-                </motion.div>
+                </AnimatePresence>
               )}
             </AnimatePresence>
           </div>

@@ -7,7 +7,7 @@ import httpx
 import logging
 from database import SessionLocal
 from models import Booking, Client, Master, Service, Salon
-from config import WHATSAPP_API_URL, WHATSAPP_SESSION
+from config import WHATSAPP_API_URL, WHATSAPP_SESSION, WHATSAPP_API_KEY
 
 logger = logging.getLogger("whatsapp")
 
@@ -30,10 +30,15 @@ async def send_whatsapp_message(phone: str, message: str) -> bool:
 
     chat_id = _format_phone(phone) + "@c.us"
 
+    headers = {}
+    if WHATSAPP_API_KEY:
+        headers["X-Api-Key"] = WHATSAPP_API_KEY
+
     try:
         async with httpx.AsyncClient(timeout=10) as client:
             response = await client.post(
                 f"{WHATSAPP_API_URL}/api/sendText",
+                headers=headers,
                 json={
                     "chatId": chat_id,
                     "text": message,

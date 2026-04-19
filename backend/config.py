@@ -26,8 +26,9 @@ FRONTEND_ORIGINS = [
 ]
 
 # WhatsApp (WAHA API)
-WHATSAPP_API_URL = os.getenv("WHATSAPP_API_URL", "")  # e.g. http://localhost:3002
+WHATSAPP_API_URL = os.getenv("WHATSAPP_API_URL", "")  # e.g. http://localhost:3010
 WHATSAPP_SESSION = os.getenv("WHATSAPP_SESSION", "default")
+WHATSAPP_API_KEY = os.getenv("WHATSAPP_API_KEY", "")
 
 # JWT (for OTP verification)
 JWT_SECRET = os.getenv("JWT_SECRET", "salonsync-secret-key-change-in-production")
