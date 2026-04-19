@@ -14,4 +14,5 @@ COPY backend/ .
 EXPOSE 8080
 
 ENV PORT=8080
-CMD ["sh", "-c", "exec uvicorn main:app --host 0.0.0.0 --port ${PORT:-8080}"]
+RUN chmod +x start.sh
+CMD ["sh", "start.sh"]
