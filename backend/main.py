@@ -26,8 +26,7 @@ except Exception:
 app = FastAPI(
     title="SalonSync - Beauty Salon Aggregator API",
     description="API для платформы-агрегатора салонов красоты Алматы",
-    version="2.0.0",
-    redirect_slashes=False
+    version="2.0.0"
 )
 
 # CORS: по умолчанию open — любой сайт может вызывать API (fetch без credentials).
