@@ -136,14 +136,14 @@ export interface OTPVerifyResponse {
 
 // Получить все услуги
 export async function getServices(): Promise<Service[]> {
-  const res = await fetch(`${API_BASE}/services/`);
+  const res = await fetch(`${API_BASE}/services`);
   if (!res.ok) throw new Error("Failed to fetch services");
   return res.json();
 }
 
 // Получить всех мастеров
 export async function getMasters(): Promise<Master[]> {
-  const res = await fetch(`${API_BASE}/masters/`);
+  const res = await fetch(`${API_BASE}/masters`);
   if (!res.ok) throw new Error("Failed to fetch masters");
   return res.json();
 }
@@ -155,7 +155,7 @@ export async function getMastersByService(serviceId: number): Promise<Master[]> 
   const mastersWithService: Master[] = [];
 
   for (const master of masters) {
-    const res = await fetch(`${API_BASE}/masters/${master.id}/services/`);
+    const res = await fetch(`${API_BASE}/masters/${master.id}/services`);
     if (res.ok) {
       const services: Service[] = await res.json();
       if (services.some(s => s.id === serviceId)) {
@@ -182,7 +182,7 @@ export async function getAvailableSlots(
 
 // Создать бронирование
 export async function createBooking(data: BookingRequest): Promise<BookingResponse> {
-  const res = await fetch(`${API_BASE}/bookings/`, {
+  const res = await fetch(`${API_BASE}/bookings`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
@@ -216,7 +216,7 @@ export async function confirmPayment(bookingId: number): Promise<BookingResponse
 
 // Получить все салоны
 export async function getSalons(): Promise<Salon[]> {
-  const res = await fetch(`${API_BASE}/salons/`);
+  const res = await fetch(`${API_BASE}/salons`);
   if (!res.ok) throw new Error("Failed to fetch salons");
   return res.json();
 }
@@ -248,7 +248,7 @@ export async function getSalonMastersByService(salonId: number, serviceId: numbe
   const mastersWithService: Master[] = [];
 
   for (const master of masters) {
-    const res = await fetch(`${API_BASE}/masters/${master.id}/services/`);
+    const res = await fetch(`${API_BASE}/masters/${master.id}/services`);
     if (res.ok) {
       const services: Service[] = await res.json();
       if (services.some(s => s.id === serviceId)) {
@@ -317,7 +317,7 @@ export async function verifyOTPCode(phone: string, code: string): Promise<OTPVer
 
 export async function getMyBookings(token: string): Promise<BookingDetailResponse[]> {
   const res = await fetch(
-    `${API_BASE}/my-bookings/?token=${encodeURIComponent(token)}`
+    `${API_BASE}/my-bookings?token=${encodeURIComponent(token)}`
   );
   if (!res.ok) throw new Error("Failed to load bookings");
   return res.json();
