@@ -155,7 +155,7 @@ export async function getMastersByService(serviceId: number): Promise<Master[]> 
   const mastersWithService: Master[] = [];
 
   for (const master of masters) {
-    const res = await fetch(`${API_BASE}/masters/${master.id}/services/`);
+    const res = await fetch(`${API_BASE}/masters/${master.id}/services`);
     if (res.ok) {
       const services: Service[] = await res.json();
       if (services.some(s => s.id === serviceId)) {
@@ -248,7 +248,7 @@ export async function getSalonMastersByService(salonId: number, serviceId: numbe
   const mastersWithService: Master[] = [];
 
   for (const master of masters) {
-    const res = await fetch(`${API_BASE}/masters/${master.id}/services/`);
+    const res = await fetch(`${API_BASE}/masters/${master.id}/services`);
     if (res.ok) {
       const services: Service[] = await res.json();
       if (services.some(s => s.id === serviceId)) {
