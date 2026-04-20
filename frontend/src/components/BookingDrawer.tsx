@@ -9,7 +9,6 @@ import {
   User,
   Phone,
   Loader2,
-  CheckCircle,
   Sparkles,
   Star,
   ChevronLeft,
@@ -30,7 +29,6 @@ import {
 } from "@/lib/api";
 import type { Locale } from "@/lib/i18n";
 import CalendarPicker from "@/components/CalendarPicker";
-import MasterPortfolioModal from "@/components/MasterPortfolioModal";
 
 interface BookingDrawerProps {
   salon: Salon;
@@ -167,7 +165,6 @@ export default function BookingDrawer({ salon, onClose, locale, onOpenMyBookings
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
   });
   const [availableDateSet, setAvailableDateSet] = useState<Set<string>>(new Set());
-  const [portfolioMaster, setPortfolioMaster] = useState<Master | null>(null);
   const [datesLoading, setDatesLoading] = useState(false);
   const [error, setError] = useState("");
   const t = locale === "kk"
@@ -182,7 +179,6 @@ export default function BookingDrawer({ salon, onClose, locale, onOpenMyBookings
         pickDate: "Күнді таңдаңыз",
         pickTime: "Уақытты таңдаңыз",
         noSlots: "Бұл күнге бос уақыт жоқ",
-        portfolio: "Жұмыстарын көру",
         yourBooking: "Сіздің жазылуыңыз",
         service: "Қызмет",
         master: "Мастер",
@@ -218,7 +214,6 @@ export default function BookingDrawer({ salon, onClose, locale, onOpenMyBookings
         pickDate: "Выберите дату",
         pickTime: "Выберите время",
         noSlots: "Нет свободного времени на эту дату",
-        portfolio: "Посмотреть работы",
         yourBooking: "Ваша запись",
         service: "Услуга",
         master: "Мастер",
@@ -264,18 +259,23 @@ export default function BookingDrawer({ salon, onClose, locale, onOpenMyBookings
   useEffect(() => {
     if (!selectedService) return;
 
+    let cancelled = false;
     async function loadMasters() {
       setLoading(true);
       try {
         const data = await getSalonMastersByService(salon.id, selectedService!.id);
+        if (cancelled) return;
         setMasters(data);
       } catch {
-        setError("Не удалось загрузить мастеров");
+        if (!cancelled) setError("Не удалось загрузить мастеров");
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     }
     loadMasters();
+    return () => {
+      cancelled = true;
+    };
   }, [salon.id, selectedService]);
 
   // Load slots when date selected
@@ -716,14 +716,6 @@ export default function BookingDrawer({ salon, onClose, locale, onOpenMyBookings
                               </div>
                             </div>
                           </button>
-                          <button
-                            type="button"
-                            onClick={() => setPortfolioMaster(master)}
-                            className="mt-3 w-full flex items-center justify-between border-t border-light-gray pt-3 font-sans text-sm text-graphite/80 transition hover:text-graphite"
-                          >
-                            <span>{t.portfolio}</span>
-                            <ArrowRight className="w-4 h-4 opacity-60" />
-                          </button>
                         </motion.div>
                       ))}
                     </motion.div>
@@ -1156,14 +1148,6 @@ export default function BookingDrawer({ salon, onClose, locale, onOpenMyBookings
       </motion.div>
     </AnimatePresence>
 
-    {portfolioMaster && (
-      <MasterPortfolioModal
-        master={portfolioMaster}
-        isOpen
-        onClose={() => setPortfolioMaster(null)}
-        locale={locale}
-      />
-    )}
     </>
   );
 }

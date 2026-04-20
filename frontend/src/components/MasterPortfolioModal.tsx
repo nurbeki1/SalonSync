@@ -14,6 +14,34 @@ interface MasterPortfolioModalProps {
   locale: Locale;
 }
 
+function getDemoPortfolio(master: Master, locale: Locale): MasterPortfolioPhoto[] {
+  const ruDescriptions = [
+    "До/после: окрашивание и восстановление волос",
+    "Дневной макияж и укладка",
+    "Маникюр с выравниванием и покрытием",
+    "Комплекс: брови + ламинирование",
+    "Вечерний образ: укладка и макияж",
+    "Clean look: уход и финишная укладка",
+  ];
+  const kkDescriptions = [
+    "Бұрын/кейін: шаш бояу және қалпына келтіру",
+    "Күндізгі макияж және укладка",
+    "Маникюр: тегістеу және жабын",
+    "Комплекс: қас және ламинация",
+    "Кешкі образ: укладка және макияж",
+    "Clean look: күтім және финалдық сәндеу",
+  ];
+  const descriptions = locale === "kk" ? kkDescriptions : ruDescriptions;
+
+  return descriptions.map((description, index) => ({
+    id: Number(`${master.id}${index + 1}`),
+    master_id: master.id,
+    image_url: `https://picsum.photos/seed/master-${master.id}-${index + 1}/900/900`,
+    description,
+    created_at: new Date(Date.now() - index * 86400000 * 2).toISOString(),
+  }));
+}
+
 export default function MasterPortfolioModal({
   master,
   isOpen,
@@ -24,6 +52,7 @@ export default function MasterPortfolioModal({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [lightbox, setLightbox] = useState<MasterPortfolioPhoto | null>(null);
+  const [isDemo, setIsDemo] = useState(false);
 
   const loadErrorMsg =
     locale === "kk" ? "Жүктеу сәтсіз аяқталды" : "Не удалось загрузить";
@@ -33,11 +62,13 @@ export default function MasterPortfolioModal({
       ? {
           title: "Портфолио",
           empty: "Портфолио әлі қосылмаған",
+          demo: "Демо-портфолио (тест үшін)",
           close: "Жабу",
         }
       : {
           title: "Портфолио",
           empty: "Портфолио ещё не добавлено",
+          demo: "Демо-портфолио (для теста)",
           close: "Закрыть",
         };
 
@@ -47,9 +78,17 @@ export default function MasterPortfolioModal({
     async function load() {
       setLoading(true);
       setError("");
+      setIsDemo(false);
       try {
         const data = await getMasterPortfolio(master.id);
-        if (!cancelled) setPhotos(data);
+        if (!cancelled) {
+          if (data.length > 0) {
+            setPhotos(data);
+          } else {
+            setPhotos(getDemoPortfolio(master, locale));
+            setIsDemo(true);
+          }
+        }
       } catch {
         if (!cancelled) setError(loadErrorMsg);
       } finally {
@@ -60,7 +99,7 @@ export default function MasterPortfolioModal({
     return () => {
       cancelled = true;
     };
-  }, [isOpen, master.id, loadErrorMsg]);
+  }, [isOpen, master, locale, loadErrorMsg]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -117,6 +156,11 @@ export default function MasterPortfolioModal({
           </div>
 
           <div className="p-5 overflow-y-auto flex-1">
+            {isDemo && (
+              <div className="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 font-sans text-xs text-amber-700">
+                {t.demo}
+              </div>
+            )}
             {loading ? (
               <div className="flex justify-center py-16">
                 <Loader2 className="w-8 h-8 animate-spin text-graphite" />
