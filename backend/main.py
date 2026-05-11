@@ -12,7 +12,7 @@ from models import (
 )
 from routers import services, masters, bookings, salons
 from routers import salon_gallery, my_bookings
-from init_salons import init_database
+from init_salons import init_database, refresh_schedules
 from config import CORS_MODE, CORS_ORIGINS, CORS_ORIGIN_REGEX
 
 # Create database tables
@@ -22,6 +22,11 @@ try:
     init_database()
 except Exception:
     logger.exception("init_database failed; API starts without seeded catalog")
+
+try:
+    refresh_schedules()
+except Exception:
+    logger.exception("refresh_schedules failed")
 
 app = FastAPI(
     title="SalonSync - Beauty Salon Aggregator API",

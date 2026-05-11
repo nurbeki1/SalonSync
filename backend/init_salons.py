@@ -364,5 +364,57 @@ def init_database():
         db.close()
 
 
+def refresh_schedules():
+    """
+    Мастерлер үшін расписаниені жаңарту.
+    Болашақта расписаниесі жоқ APPROVED мастерлерге 30 күн алға автоматты жасайды.
+    Сервер әр іске қосылғанда шақырылады.
+    """
+    db = SessionLocal()
+    try:
+        today = date.today()
+        masters = db.query(Master).filter(
+            Master.is_active == True,
+            Master.status == MasterStatus.APPROVED
+        ).all()
+
+        count = 0
+        for master in masters:
+            future_schedule = db.query(MasterSchedule).filter(
+                MasterSchedule.master_id == master.id,
+                MasterSchedule.date >= today
+            ).first()
+
+            if future_schedule:
+                continue  # Мастердің болашақ расписаниесі бар — өткізіп жіберу
+
+            for day_offset in range(1, 31):
+                work_date = today + timedelta(days=day_offset)
+                if work_date.weekday() == 6 and master.id % 3 == 0:
+                    continue
+                existing = db.query(MasterSchedule).filter(
+                    MasterSchedule.master_id == master.id,
+                    MasterSchedule.date == work_date
+                ).first()
+                if not existing:
+                    db.add(MasterSchedule(
+                        master_id=master.id,
+                        date=work_date,
+                        start_time=time(10, 0),
+                        end_time=time(20, 0),
+                        is_available=True
+                    ))
+                    count += 1
+
+        db.commit()
+        if count:
+            print(f"refresh_schedules: {count} жаңа расписание жасалды")
+    except Exception as e:
+        db.rollback()
+        print(f"refresh_schedules error: {e}")
+    finally:
+        db.close()
+
+
 if __name__ == "__main__":
     init_database()
