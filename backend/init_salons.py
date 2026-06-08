@@ -367,12 +367,13 @@ def init_database():
 def refresh_schedules():
     """
     Мастерлер үшін расписаниені жаңарту.
-    Болашақта расписаниесі жоқ APPROVED мастерлерге 30 күн алға автоматты жасайды.
+    Болашақта <14 күн расписаниесі қалған APPROVED мастерлерге 30 күн алға автоматты жасайды.
     Сервер әр іске қосылғанда шақырылады.
     """
     db = SessionLocal()
     try:
         today = date.today()
+        cutoff = today + timedelta(days=14)
         masters = db.query(Master).filter(
             Master.is_active == True,
             Master.status == MasterStatus.APPROVED
@@ -380,13 +381,14 @@ def refresh_schedules():
 
         count = 0
         for master in masters:
-            future_schedule = db.query(MasterSchedule).filter(
+            future_count = db.query(MasterSchedule).filter(
                 MasterSchedule.master_id == master.id,
-                MasterSchedule.date >= today
-            ).first()
+                MasterSchedule.date >= today,
+                MasterSchedule.date <= cutoff
+            ).count()
 
-            if future_schedule:
-                continue  # Мастердің болашақ расписаниесі бар — өткізіп жіберу
+            if future_count >= 7:
+                continue  # Жеткілікті болашақ расписание бар — өткізіп жіберу
 
             for day_offset in range(1, 31):
                 work_date = today + timedelta(days=day_offset)
